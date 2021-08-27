@@ -1,34 +1,23 @@
+#!groovy
+
 pipeline {
-  agent {
-    label 'master'
-  }
+  agent none
   stages {
-    stage('Docker node test') {
+    stage('Maven Install') {
       agent {
         docker {
-          label 'master'
-          image 'node:7-alpine'
-          args '--name docker-node'
+          image 'maven:3.5.0'
         }
-
       }
       steps {
-        sh 'node --version'
+        sh 'mvn clean install'
       }
     }
-
-    stage('Docker maven test') {
-      agent {
-        docker {
-          label 'master'
-          image 'maven:3-alpine'
-        }
-
-      }
+    stage('Docker Build') {
+      agent any
       steps {
-        sh 'mvn --version'
+        sh 'docker build -t shanem/spring-petclinic:latest .'
       }
     }
-
   }
 }
